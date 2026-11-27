@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>草叶 OFD 预览</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: #1c1c1c;
+      background: #d9d9d6;
+    }
+    header {
+      flex: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 16px;
+      background: #f7f7f5;
+      border-bottom: 1px solid #c8c8c4;
+    }
+    header h1 { margin: 0; font-size: 16px; }
+    header p { margin: 0; color: #555; font-size: 12px; }
+    .tools { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    button, .file {
+      border: 1px solid #b9b9b4;
+      background: #fff;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    button:hover { background: #f0f0ec; }
+    input[type="file"] { display: none; }
+    caoye-ofd { flex: 1; min-height: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>草叶 OFD 预览</h1>
+      <p>打开没有档号章的 OFD 后可以补一枚示例章，并下载写进文件的 OFD。对接方式见《对接说明》。</p>
+    </div>
+    <div class="tools">
+      <button id="stamp" type="button">显示档号章</button>
+      <button id="download" type="button">下载带章 OFD</button>
+      <label class="file">打开 OFD<input id="file" type="file" accept=".ofd,application/ofd,application/octet-stream" /></label>
+    </div>
+  </header>
+  <caoye-ofd id="preview"></caoye-ofd>
+  <script type="module">
+    import "./caoye-ofd.js";
+
+    const preview = document.getElementById("preview");
+    const input = document.getElementById("file");
+    const demoStamp = {
+      rows: [
+        ["0240", "2023", "38"],
+        ["综合类", "100年", "17"]
+      ]
+    };
+
+    document.getElementById("stamp").addEventListener("click", () => {
+      preview.setArchiveStamp(demoStamp);
+    });
+    document.getElementById("download").addEventListener("click", () => {
+      preview.setArchiveStamp(demoStamp).then(() => preview.download());
+    });
+    input.addEventListener("change", () => {
+      const file = input.files && input.files[0];
+      if (file) {
+        preview.setArchiveStamp(demoStamp);
+        preview.open(file, file.name);
+      }
+      input.value = "";
+    });
+
+    document.addEventListener("dragover", (event) => event.preventDefault());
+    document.addEventListener("drop", (event) => {
+      event.preventDefault();
+      const file = event.dataTransfer.files && event.dataTransfer.files[0];
+      if (file) {
+        preview.setArchiveStamp(demoStamp);
+        preview.open(file, file.name);
+      }
+    });
+  </script>
+</body>
+</html>
